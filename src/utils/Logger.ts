@@ -69,4 +69,4 @@ export class Logger {
   setContext(context: string): void {
     this.context = context;
   }
-} 
+}
