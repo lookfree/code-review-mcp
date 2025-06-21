@@ -73,8 +73,8 @@ export default {
   
   // 转换配置
   transform: {
-    '^.+\\.ts$': ['ts-jest', {
+    '^.+\.ts$': ['ts-jest', {
       useESM: true
     }]
   }
-}; 
+};
