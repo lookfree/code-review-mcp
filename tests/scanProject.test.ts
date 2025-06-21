@@ -142,4 +142,4 @@ describe('scanProject', () => {
       expect(typeof response.duration).toBe('number');
     });
   });
-}); 
+});
