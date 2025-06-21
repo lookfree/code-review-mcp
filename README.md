@@ -111,6 +111,7 @@ code-review-mcp/
 │   ├── core/           # 核心MCP服务器
 │   ├── tools/          # MCP工具实现
 │   ├── processors/     # 代码审查引擎
+│   │   └── checkers/   # 代码检查器
 │   ├── utils/          # 工具类
 │   └── types/          # 类型定义
 ├── tests/              # 测试文件
@@ -135,6 +136,43 @@ npm test
 ```bash
 npm run lint
 ```
+
+## 🖥️ Cursor IDE 配置
+
+要在 Cursor IDE 中使用此 MCP 工具，请按照以下步骤配置：
+
+1. 打开 Cursor IDE
+2. 点击左下角的设置图标，选择 "Settings"
+3. 在搜索框中输入 "MCP"
+4. 找到 "MCP: Custom MCPs" 设置
+5. 点击 "Edit in settings.json"
+6. 在配置文件中添加以下内容：
+
+```json
+"mcp.customMCPs": [
+  {
+    "name": "Code Review",
+    "command": "npx code-review-mcp",
+    "description": "Java Spring Boot代码审查工具",
+    "models": ["claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"]
+  }
+]
+```
+
+7. 保存配置文件
+8. 重启 Cursor IDE
+
+### 使用方法
+
+配置完成后，您可以在 Cursor IDE 的对话框中直接调用代码审查功能：
+
+1. 在对话框中输入 `/mcp Code Review` 或点击对话框底部的 MCP 按钮选择 "Code Review"
+2. 输入您的代码审查需求，例如：
+   - "扫描当前项目并检查安全问题"
+   - "生成代码质量报告"
+   - "检查我的Spring Boot项目中的性能问题"
+
+MCP 工具将自动执行相应的代码审查任务并返回结果。
 
 ## 📝 示例
 

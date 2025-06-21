@@ -16,17 +16,52 @@ import {
   IssueSeverity,
   ScanProjectParams,
   JavaProjectInfo,
-  // CodeAnalysisResult  // 暂时不使用
 } from '../types/index.js';
+
+// 导入检查器
+import { BaseChecker } from './checkers/BaseChecker.js';
+import { CodeStructureChecker } from './checkers/CodeStructureChecker.js';
+import { SecurityChecker } from './checkers/SecurityChecker.js';
+import { PerformanceChecker } from './checkers/PerformanceChecker.js';
+import { DatabaseChecker } from './checkers/DatabaseChecker.js';
+import { ThreadSafetyChecker } from './checkers/ThreadSafetyChecker.js';
+import { ApiDesignChecker } from './checkers/ApiDesignChecker.js';
+import { ExceptionHandlingChecker } from './checkers/ExceptionHandlingChecker.js';
+import { ConfigurationChecker } from './checkers/ConfigurationChecker.js';
+import { ServiceRelationChecker } from './checkers/ServiceRelationChecker.js';
+import { TransactionChecker } from './checkers/TransactionChecker.js';
+import { EnvironmentChecker } from './checkers/EnvironmentChecker.js';
+import { MaintainabilityChecker } from './checkers/MaintainabilityChecker.js';
+import { ThirdPartyChecker } from './checkers/ThirdPartyChecker.js';
 
 export class CodeReviewEngine {
   private logger: Logger;
-  // private rules: Map<string, ReviewRule>; // 暂时不使用
+  private checkers: BaseChecker[] = [];
 
   constructor(logger?: Logger) {
     this.logger = logger || new Logger('CodeReviewEngine');
-    // this.rules = new Map();
-    // this.initializeRules();
+    this.initializeCheckers();
+  }
+
+  /**
+   * 初始化检查器
+   */
+  private initializeCheckers(): void {
+    this.checkers = [
+      new CodeStructureChecker(this.logger),
+      new SecurityChecker(this.logger),
+      new PerformanceChecker(this.logger),
+      new DatabaseChecker(this.logger),
+      new ThreadSafetyChecker(this.logger),
+      new ApiDesignChecker(this.logger),
+      new ExceptionHandlingChecker(this.logger),
+      new ConfigurationChecker(this.logger),
+      new ServiceRelationChecker(this.logger),
+      new TransactionChecker(this.logger),
+      new EnvironmentChecker(this.logger),
+      new MaintainabilityChecker(this.logger),
+      new ThirdPartyChecker(this.logger),
+    ];
   }
 
   /**
@@ -54,10 +89,16 @@ export class CodeReviewEngine {
       const allIssues: ReviewIssue[] = [];
       const categories = params.categories || Object.values(ReviewCategory);
 
-      for (const category of categories) {
-        this.logger.info(`执行 ${category} 类检查`);
-        const issues = await this.runCategoryChecks(category, files, params.projectPath);
-        allIssues.push(...issues);
+      // 根据配置的分类执行检查
+      for (const checker of this.checkers) {
+        const checkerCategory = checker.getCategory();
+        
+        // 如果当前检查器的分类在需要检查的分类列表中
+        if (categories.includes(checkerCategory)) {
+          this.logger.info(`执行 ${checkerCategory} 类检查`);
+          const issues = await checker.check(files, params.projectPath);
+          allIssues.push(...issues);
+        }
       }
 
       // 生成摘要
@@ -148,245 +189,10 @@ export class CodeReviewEngine {
         cwd: params.projectPath,
         ignore: excludePatterns
       });
-             files.push(...matchedFiles.map((f: string) => join(params.projectPath, f)));
+      files.push(...matchedFiles.map((f: string) => join(params.projectPath, f)));
     }
 
     return [...new Set(files)]; // 去重
-  }
-
-  /**
-   * 执行特定分类的检查
-   */
-  private async runCategoryChecks(
-    category: ReviewCategory, 
-    files: string[], 
-    projectPath: string
-  ): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-
-    switch (category) {
-      case ReviewCategory.CODE_STRUCTURE:
-        issues.push(...await this.checkCodeStructure(files));
-        break;
-      case ReviewCategory.PERFORMANCE:
-        issues.push(...await this.checkPerformance(files));
-        break;
-      case ReviewCategory.SECURITY:
-        issues.push(...await this.checkSecurity(files));
-        break;
-      case ReviewCategory.DATABASE:
-        issues.push(...await this.checkDatabase(files));
-        break;
-      case ReviewCategory.THREAD_SAFETY:
-        issues.push(...await this.checkThreadSafety(files));
-        break;
-      case ReviewCategory.API_DESIGN:
-        issues.push(...await this.checkApiDesign(files));
-        break;
-      case ReviewCategory.EXCEPTION_HANDLING:
-        issues.push(...await this.checkExceptionHandling(files));
-        break;
-      case ReviewCategory.CONFIGURATION:
-        issues.push(...await this.checkConfiguration(projectPath));
-        break;
-      // 其他分类的检查...
-    }
-
-    return issues;
-  }
-
-  /**
-   * 检查代码结构与质量
-   */
-  private async checkCodeStructure(files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-
-    for (const file of files.filter(f => f.endsWith('.java'))) {
-      try {
-        const content = readFileSync(file, 'utf-8');
-        // const lines = content.split('\n'); // 暂时不使用
-
-        // 检查重复编码
-        issues.push(...this.checkDuplicateCode(file, content));
-        
-        // 检查命名规范
-        issues.push(...this.checkNamingConventions(file, content));
-        
-        // 检查设计模式使用
-        issues.push(...this.checkDesignPatterns(file, content));
-        
-        // 检查方法复杂度
-        issues.push(...this.checkMethodComplexity(file, content));
-
-      } catch (error: any) {
-        this.logger.warn(`无法读取文件 ${file}: ${error.message}`);
-      }
-    }
-
-    return issues;
-  }
-
-  /**
-   * 检查性能问题
-   */
-  private async checkPerformance(files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-
-    for (const file of files.filter(f => f.endsWith('.java'))) {
-      try {
-        const content = readFileSync(file, 'utf-8');
-        
-        // 检查循环优化
-        issues.push(...this.checkLoopOptimization(file, content));
-        
-        // 检查API调用频率
-        issues.push(...this.checkApiCallFrequency(file, content));
-        
-        // 检查缓存使用
-        issues.push(...this.checkCacheUsage(file, content));
-        
-        // 检查数据库查询优化
-        issues.push(...this.checkDatabaseQueryOptimization(file, content));
-
-      } catch (error: any) {
-        this.logger.warn(`性能检查失败 ${file}: ${error.message}`);
-      }
-    }
-
-    return issues;
-  }
-
-  /**
-   * 检查安全问题
-   */
-  private async checkSecurity(files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-
-    for (const file of files.filter(f => f.endsWith('.java'))) {
-      try {
-        const content = readFileSync(file, 'utf-8');
-        
-        // 检查SQL注入
-        issues.push(...this.checkSqlInjection(file, content));
-        
-        // 检查XSS攻击防护
-        issues.push(...this.checkXssProtection(file, content));
-        
-        // 检查权限验证
-        issues.push(...this.checkPermissionValidation(file, content));
-        
-        // 检查输入验证
-        issues.push(...this.checkInputValidation(file, content));
-
-      } catch (error: any) {
-        this.logger.warn(`安全检查失败 ${file}: ${error.message}`);
-      }
-    }
-
-    return issues;
-  }
-
-  // 具体检查方法的实现...
-  private checkDuplicateCode(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现重复代码检查逻辑
-    return issues;
-  }
-
-  private checkNamingConventions(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现命名规范检查逻辑
-    return issues;
-  }
-
-  private checkDesignPatterns(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现设计模式检查逻辑
-    return issues;
-  }
-
-  private checkMethodComplexity(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现方法复杂度检查逻辑
-    return issues;
-  }
-
-  private checkLoopOptimization(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现循环优化检查逻辑
-    return issues;
-  }
-
-  private checkApiCallFrequency(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现API调用频率检查逻辑
-    return issues;
-  }
-
-  private checkCacheUsage(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现缓存使用检查逻辑
-    return issues;
-  }
-
-  private checkDatabaseQueryOptimization(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现数据库查询优化检查逻辑
-    return issues;
-  }
-
-  private checkSqlInjection(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现SQL注入检查逻辑
-    return issues;
-  }
-
-  private checkXssProtection(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现XSS防护检查逻辑
-    return issues;
-  }
-
-  private checkPermissionValidation(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现权限验证检查逻辑
-    return issues;
-  }
-
-  private checkInputValidation(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现输入验证检查逻辑
-    return issues;
-  }
-
-  private async checkDatabase(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现数据库相关检查
-    return issues;
-  }
-
-  private async checkThreadSafety(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现线程安全检查
-    return issues;
-  }
-
-  private async checkApiDesign(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现API设计检查
-    return issues;
-  }
-
-  private async checkExceptionHandling(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现异常处理检查
-    return issues;
-  }
-
-  private async checkConfiguration(_projectPath: string): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现配置检查
-    return issues;
   }
 
   /**
@@ -405,22 +211,4 @@ export class CodeReviewEngine {
 
     return summary;
   }
-
-  /**
-   * 初始化检查规则 (暂时不使用)
-   */
-  // private initializeRules(): void {
-  //   // 这里可以加载外部规则配置
-  //   // 暂时使用硬编码规则
-  // }
-}
-
-// 审查规则接口 (暂时不使用)
-// interface ReviewRule {
-//   id: string;
-//   category: ReviewCategory;
-//   severity: IssueSeverity;
-//   pattern: RegExp;
-//   description: string;
-//   suggestion: string;
-// } 
+} 
