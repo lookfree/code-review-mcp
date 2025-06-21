@@ -96,9 +96,9 @@ async function createReport(params: ReportGenerationParams): Promise<ReviewRepor
   const minorCount = allIssues.filter(i => i.severity === 'minor').length;
   
   let qualityScore = 100;
-  qualityScore -= criticalCount * 20; // 严重问题扣20分
-  qualityScore -= majorCount * 10;    // 重要问题扣10分
-  qualityScore -= minorCount * 5;     // 一般问题扣5分
+  qualityScore -= criticalCount * 20; // 严重问题扢20分
+  qualityScore -= majorCount * 10;    // 重要问题扢10分
+  qualityScore -= minorCount * 5;     // 一般问题扢5分
   qualityScore = Math.max(0, qualityScore);
   
   // 生成建议
@@ -247,17 +247,17 @@ ${issue.line ? `- **行号**: ${issue.line}` : ''}
 ${issue.suggestion ? `- **建议**: ${issue.suggestion}` : ''}
 - **分类**: ${issue.category}
 - **规则ID**: ${issue.ruleId}
-
----
-`).join('')}`;
+`).join('\n')}
+`;
 }
 
 /**
- * 生成改进建议
+ * 生成建议
  */
 function generateRecommendations(issues: any[]): string[] {
   const recommendations: string[] = [];
   
+  // 根据问题类型生成建议
   const criticalCount = issues.filter(i => i.severity === 'critical').length;
   const securityIssues = issues.filter(i => i.category === 'security').length;
   const performanceIssues = issues.filter(i => i.category === 'performance').length;
@@ -300,24 +300,16 @@ function extractParams(request: any): any {
  * 参数验证函数
  */
 function validateParams(params: any): void {
-  if (!params.results) {
+  if (!params.results || !Array.isArray(params.results)) {
     throw new Error('缺少必需的参数: results');
   }
   
-  if (!Array.isArray(params.results)) {
-    throw new Error('参数 results 必须是数组类型');
+  if (!params.format || !['json', 'html', 'markdown'].includes(params.format)) {
+    throw new Error('参数 format 必须是 json、html 或 markdown');
   }
   
   if (!params.outputPath) {
     throw new Error('缺少必需的参数: outputPath');
-  }
-  
-  if (!params.format) {
-    throw new Error('缺少必需的参数: format');
-  }
-  
-  if (!['json', 'html', 'markdown'].includes(params.format)) {
-    throw new Error('参数 format 必须是 json、html 或 markdown');
   }
 }
 
@@ -326,28 +318,36 @@ function validateParams(params: any): void {
  */
 export const toolDefinition = {
   name: 'generate_report',
-  description: '📊 生成代码审查报告，支持JSON、HTML、Markdown格式',
+  description: '📃 生成详细的代码审查报告，支持JSON、HTML和Markdown格式',
   inputSchema: {
     type: 'object',
     properties: {
       results: {
         type: 'array',
-        description: '审查结果数组'
+        description: '审查结果数组',
+        items: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            issues: { type: 'array' },
+            summary: { type: 'object' }
+          }
+        }
       },
       format: {
         type: 'string',
         enum: ['json', 'html', 'markdown'],
-        description: '报告格式'
+        description: '输出格式'
       },
       outputPath: {
         type: 'string',
-        description: '报告输出文件路径'
+        description: '报告输出路径'
       },
       includeDetails: {
         type: 'boolean',
-        description: '是否包含详细信息，默认为true'
+        description: '是否包含详细信息'
       }
     },
     required: ['results', 'format', 'outputPath']
   }
-}; 
+};

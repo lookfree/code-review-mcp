@@ -10,7 +10,7 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Demo Application</name>
+    <n>Demo Application</n>
     <description>示例Spring Boot项目用于代码审查测试</description>
 
     <properties>
@@ -55,4 +55,4 @@
             </plugin>
         </plugins>
     </build>
-</project> 
+</project>

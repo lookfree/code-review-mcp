@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     
     // 显示可用工具
     const tools = server.getRegisteredTools();
-    logger.info(`🛠️  可用工具: ${tools.join(', ')}`);
+    logger.info(`🔧  可用工具: ${tools.join(', ')}`);
     
     // 启动服务器
     await server.start();

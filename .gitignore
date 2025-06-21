@@ -134,4 +134,4 @@ test-report.html
 test-*.html
 
 # Local development files
-*.local 
+*.local

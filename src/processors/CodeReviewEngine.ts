@@ -196,7 +196,7 @@ export class CodeReviewEngine {
   }
 
   /**
-   * 生成审查摘要
+   * 生成摘要报告
    */
   private generateSummary(issues: ReviewIssue[], filesScanned: number, reviewTime: number): ReviewSummary {
     const summary: ReviewSummary = {
@@ -211,4 +211,4 @@ export class CodeReviewEngine {
 
     return summary;
   }
-} 
+}

@@ -1,109 +1,16 @@
-# Code Review MCP
+# 代码审查MCP
 
-🔍 一个专为Java Spring Boot项目设计的代码审查MCP服务器，基于详细的代码质量检查清单提供全面的代码审查功能。
+基于MCP模板实现的代码审查服务器，专注于Java Spring Boot项目代码质量检查。
 
-## 🌟 特性
+## 功能特点
 
-### 📋 全面的代码审查分类
-
-基于专业的代码审查清单，支持以下13个主要分类的检查：
-
-1. **代码结构与质量** - 重复编码、设计模式、命名规范
-2. **性能优化** - 循环优化、API调用、缓存使用、数据库查询
-3. **开发与线程安全** - 线程池、并发控制、异常处理
-4. **安全问题** - SQL注入、XSS攻击、权限检查、输入验证
-5. **接口设计** - 参数验证、返回格式、版本控制
-6. **服务间关系** - 服务定义、调用效率、注册发现
-7. **数据库操作** - 事务管理、连接池、索引优化
-8. **事务管理** - 事务范围、回滚机制、一致性
-9. **环境依赖** - 服务循环依赖、配置管理
-10. **配置与部署** - 环境配置、数据库配置、监控
-11. **异常处理** - 全局异常、业务异常、日志记录
-12. **代码可维护性** - 注释、设计模式、单元测试
-13. **第三方依赖管理** - 依赖版本、安全漏洞
-
-### 🛠️ 可用工具
-
-- **scan_project** - 扫描Java Spring Boot项目并执行全面的代码审查
-- **generate_report** - 生成代码审查报告，支持JSON、HTML、Markdown格式
-
-### 📊 报告功能
-
+- 全面的代码质量检查
+- 详细的代码审查报告生成
 - 支持多种输出格式（JSON、HTML、Markdown）
-- 详细的问题分类和严重程度标记
-- 质量评分系统（0-100分）
-- 改进建议和最佳实践推荐
-- 美观的HTML报告界面
+- 针对Java Spring Boot项目优化
+- 基于MCP（Model Context Protocol）实现
 
-## 🚀 安装
-
-```bash
-npm install code-review-mcp
-```
-
-## 📖 使用方法
-
-### 启动MCP服务器
-
-```bash
-npm start
-```
-
-或者使用开发模式：
-
-```bash
-npm run dev
-```
-
-### 使用工具
-
-#### 1. 扫描项目
-
-```json
-{
-  "tool": "scan_project",
-  "params": {
-    "projectPath": "/path/to/your/java/project",
-    "categories": ["security", "performance", "code_structure"],
-    "outputFormat": "json"
-  }
-}
-```
-
-#### 2. 生成报告
-
-```json
-{
-  "tool": "generate_report",
-  "params": {
-    "results": [/* 扫描结果 */],
-    "format": "html",
-    "outputPath": "./code-review-report.html"
-  }
-}
-```
-
-### 参数说明
-
-#### scan_project 参数
-
-- `projectPath` (必需) - 要扫描的项目根目录路径
-- `includePatterns` (可选) - 包含的文件模式，默认为 `["**/*.java"]`
-- `excludePatterns` (可选) - 排除的文件模式，默认排除 target、build、node_modules 等目录
-- `categories` (可选) - 要执行的审查分类，默认执行所有分类
-- `outputFormat` (可选) - 输出格式，支持 json、html、markdown
-- `reportPath` (可选) - 报告输出路径
-
-#### generate_report 参数
-
-- `results` (必需) - 审查结果数组
-- `format` (必需) - 报告格式：json、html、markdown
-- `outputPath` (必需) - 报告输出文件路径
-- `includeDetails` (可选) - 是否包含详细信息，默认为true
-
-## 🔧 开发
-
-### 项目结构
+## 项目结构
 
 ```
 code-review-mcp/
@@ -119,22 +26,55 @@ code-review-mcp/
 └── package.json
 ```
 
-### 构建
+## 在Cursor中配置使用
+
+要在Cursor中配置并使用这个MCP服务，请按照以下步骤操作：
+
+### 1. 克隆仓库
 
 ```bash
+git clone https://github.com/lookfree/code-review-mcp.git
+cd code-review-mcp
+```
+
+### 2. 安装依赖并构建
+
+```bash
+npm install
 npm run build
 ```
 
-### 测试
+### 3. 在Cursor中配置
 
-```bash
-npm test
+1. 打开Cursor IDE
+2. 点击左下角的设置图标，选择"设置"
+3. 在设置中找到"MCP"或"模型上下文协议"部分
+4. 点击"添加MCP"按钮
+5. 输入以下信息：
+   - 名称：代码审查MCP
+   - 命令：`node <克隆仓库路径>/dist/index.js`
+   - 描述：基于MCP的Java Spring Boot项目代码审查工具
+
+注意：请将`<克隆仓库路径>`替换为你实际的仓库路径。
+
+### 4. 使用MCP
+
+配置完成后，你可以在Cursor中使用以下命令来调用这个MCP：
+
+```
+/mcp 代码审查MCP
 ```
 
-### 代码检查
+然后你可以使用以下工具：
 
-```bash
-npm run lint
+1. `scan_project` - 扫描Java项目并执行代码审查
+2. `generate_report` - 生成审查报告
+
+例如：
+
+```
+/mcp 代码审查MCP
+请帮我审查这个Java项目的代码质量，项目路径是 /path/to/your/java/project
 ```
 
 ## 🖥️ Cursor IDE 配置
@@ -174,42 +114,64 @@ npm run lint
 
 MCP 工具将自动执行相应的代码审查任务并返回结果。
 
-## 📝 示例
-
-### 基本使用示例
-
-```typescript
-import { CodeReviewMCPServer } from 'code-review-mcp';
-
-const server = new CodeReviewMCPServer();
-await server.start();
-```
-
-### 扫描项目示例
+## 安装
 
 ```bash
-# 扫描当前目录的Java项目
-code-review-mcp scan_project --projectPath . --categories security,performance
+npm install code-review-mcp
 ```
 
-## 🤝 贡献
+## 使用方法
 
-欢迎提交 Issue 和 Pull Request！
+### 作为命令行工具
 
-## 📄 许可证
+```bash
+code-review-mcp scan --project=/path/to/project --output=report.html
+```
 
-MIT License
+### 作为库引用
 
-## 🔗 相关链接
+```javascript
+import { scanProject } from 'code-review-mcp';
+
+const result = await scanProject({
+  projectPath: '/path/to/project',
+  outputFormat: 'json'
+});
+
+console.log(result);
+```
+
+## 配置选项
+
+| 选项 | 描述 | 默认值 |
+|------|------|--------|
+| projectPath | 项目路径 | 当前目录 |
+| includePatterns | 包含的文件模式 | ['**/*.java'] |
+| excludePatterns | 排除的文件模式 | ['**/test/**'] |
+| categories | 检查类别 | 所有类别 |
+| outputFormat | 输出格式 | 'json' |
+| reportPath | 报告路径 | null |
+
+## 检查类别
+
+- 代码结构
+- 性能优化
+- 安全检查
+- 数据库操作
+- 线程安全
+- API设计
+- 异常处理
+- 配置管理
+
+## 贡献指南
+
+欢迎提交Pull Request或Issue来改进本项目。
+
+## 许可证
+
+MIT
+
+## 链接
 
 - [GitHub Repository](https://github.com/lookfree/code-review-mcp)
-- [MCP Protocol](https://modelcontextprotocol.io/)
 - [Issues](https://github.com/lookfree/code-review-mcp/issues)
-
-## 🏷️ 版本历史
-
-### v1.0.0
-- 初始版本
-- 支持13种代码审查分类
-- 提供项目扫描和报告生成功能
-- 支持多种输出格式 
