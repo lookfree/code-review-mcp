@@ -158,4 +158,4 @@ export const toolDefinition = {
     },
     required: ['projectPath']
   }
-}; 
+};
