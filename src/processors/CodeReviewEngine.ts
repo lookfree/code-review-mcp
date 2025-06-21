@@ -249,7 +249,7 @@ export class CodeReviewEngine {
         issues.push(...this.checkDatabaseQueryOptimization(file, content));
 
       } catch (error: any) {
-        this.logger.warn(`性能检查失败 ${file}: ${error.message}`);
+        this.logger.warn(`无法读取文件 ${file}: ${error.message}`);
       }
     }
 
@@ -269,7 +269,7 @@ export class CodeReviewEngine {
         // 检查SQL注入
         issues.push(...this.checkSqlInjection(file, content));
         
-        // 检查XSS攻击防护
+        // 检查XSS防护
         issues.push(...this.checkXssProtection(file, content));
         
         // 检查权限验证
@@ -279,148 +279,116 @@ export class CodeReviewEngine {
         issues.push(...this.checkInputValidation(file, content));
 
       } catch (error: any) {
-        this.logger.warn(`安全检查失败 ${file}: ${error.message}`);
+        this.logger.warn(`无法读取文件 ${file}: ${error.message}`);
       }
     }
 
     return issues;
   }
 
-  // 具体检查方法的实现...
+  // 实现各种具体的检查方法
   private checkDuplicateCode(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现重复代码检查逻辑
-    return issues;
+    // 实际实现中应该使用重复代码检测算法
+    return [];
   }
 
   private checkNamingConventions(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现命名规范检查逻辑
-    return issues;
+    // 实际实现中应该检查Java命名规范
+    return [];
   }
 
   private checkDesignPatterns(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现设计模式检查逻辑
-    return issues;
+    // 实际实现中应该检查设计模式的使用
+    return [];
   }
 
   private checkMethodComplexity(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现方法复杂度检查逻辑
-    return issues;
+    // 实际实现中应该计算方法的循环复杂度等
+    return [];
   }
 
   private checkLoopOptimization(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现循环优化检查逻辑
-    return issues;
+    // 实际实现中应该检查循环优化问题
+    return [];
   }
 
   private checkApiCallFrequency(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现API调用频率检查逻辑
-    return issues;
+    // 实际实现中应该检查API调用频率问题
+    return [];
   }
 
   private checkCacheUsage(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现缓存使用检查逻辑
-    return issues;
+    // 实际实现中应该检查缓存使用情况
+    return [];
   }
 
   private checkDatabaseQueryOptimization(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现数据库查询优化检查逻辑
-    return issues;
+    // 实际实现中应该检查数据库查询优化
+    return [];
   }
 
   private checkSqlInjection(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现SQL注入检查逻辑
-    return issues;
+    // 实际实现中应该检查SQL注入问题
+    return [];
   }
 
   private checkXssProtection(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现XSS防护检查逻辑
-    return issues;
+    // 实际实现中应该检查XSS防护
+    return [];
   }
 
   private checkPermissionValidation(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现权限验证检查逻辑
-    return issues;
+    // 实际实现中应该检查权限验证
+    return [];
   }
 
   private checkInputValidation(_file: string, _content: string): ReviewIssue[] {
-    const issues: ReviewIssue[] = [];
-    // 实现输入验证检查逻辑
-    return issues;
+    // 实际实现中应该检查输入验证
+    return [];
   }
 
   private async checkDatabase(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现数据库相关检查
-    return issues;
+    // 实际实现中应该检查数据库相关问题
+    return [];
   }
 
   private async checkThreadSafety(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现线程安全检查
-    return issues;
+    // 实际实现中应该检查线程安全问题
+    return [];
   }
 
   private async checkApiDesign(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现API设计检查
-    return issues;
+    // 实际实现中应该检查API设计问题
+    return [];
   }
 
   private async checkExceptionHandling(_files: string[]): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现异常处理检查
-    return issues;
+    // 实际实现中应该检查异常处理问题
+    return [];
   }
 
   private async checkConfiguration(_projectPath: string): Promise<ReviewIssue[]> {
-    const issues: ReviewIssue[] = [];
-    // 实现配置检查
-    return issues;
+    // 实际实现中应该检查配置相关问题
+    return [];
   }
 
   /**
    * 生成审查摘要
    */
   private generateSummary(issues: ReviewIssue[], filesScanned: number, reviewTime: number): ReviewSummary {
-    const summary: ReviewSummary = {
+    const criticalIssues = issues.filter(i => i.severity === IssueSeverity.CRITICAL).length;
+    const majorIssues = issues.filter(i => i.severity === IssueSeverity.MAJOR).length;
+    const minorIssues = issues.filter(i => i.severity === IssueSeverity.MINOR).length;
+    const infoIssues = issues.filter(i => i.severity === IssueSeverity.INFO).length;
+    
+    return {
       totalIssues: issues.length,
-      criticalIssues: issues.filter(i => i.severity === IssueSeverity.CRITICAL).length,
-      majorIssues: issues.filter(i => i.severity === IssueSeverity.MAJOR).length,
-      minorIssues: issues.filter(i => i.severity === IssueSeverity.MINOR).length,
-      infoIssues: issues.filter(i => i.severity === IssueSeverity.INFO).length,
+      criticalIssues,
+      majorIssues,
+      minorIssues,
+      infoIssues,
       filesScanned,
       reviewTime
     };
-
-    return summary;
   }
-
-  /**
-   * 初始化检查规则 (暂时不使用)
-   */
-  // private initializeRules(): void {
-  //   // 这里可以加载外部规则配置
-  //   // 暂时使用硬编码规则
-  // }
 }
-
-// 审查规则接口 (暂时不使用)
-// interface ReviewRule {
-//   id: string;
-//   category: ReviewCategory;
-//   severity: IssueSeverity;
-//   pattern: RegExp;
-//   description: string;
-//   suggestion: string;
-// } 
