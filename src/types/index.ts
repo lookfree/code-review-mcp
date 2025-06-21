@@ -234,4 +234,4 @@ export interface ReportGenerationParams {
   format: 'json' | 'html' | 'markdown';
   outputPath: string;
   includeDetails?: boolean;
-} 
+}
